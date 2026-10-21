@@ -1,0 +1,164 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="d-flex flex-wrap justify-content-between
+                align-items-center gap-3 mb-4">
+        <div>
+            <h2 class="mb-1">Quản lý khách hàng</h2>
+            <p class="text-muted mb-0">
+                Theo dõi và quản lý tài khoản khách hàng MENSTYLE.
+            </p>
+        </div>
+
+        <a href="{{ url_for('admin.dashboard') }}"
+           class="btn btn-outline-secondary">
+            ← Trang quản trị
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET"
+                  action="{{ url_for('admin.customer_list') }}"
+                  class="row g-2">
+
+                <div class="col-md-9">
+                    <input
+                        type="search"
+                        name="keyword"
+                        class="form-control"
+                        placeholder="Tìm theo tên, email hoặc số điện thoại..."
+                        value="{{ keyword }}">
+                </div>
+
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit"
+                            class="btn btn-primary flex-grow-1">
+                        Tìm kiếm
+                    </button>
+
+                    <a href="{{ url_for('admin.customer_list') }}"
+                       class="btn btn-outline-secondary">
+                        Xóa lọc
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <strong>
+                Danh sách khách hàng: {{ customers|length }} tài khoản
+            </strong>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">ID</th>
+                            <th>Họ tên</th>
+                            <th>Email</th>
+                            <th>Số điện thoại</th>
+                            <th>Ngày tạo</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for customer in customers %}
+                        <tr>
+                            <td class="ps-3">{{ customer.id }}</td>
+
+                            <td>
+                                <strong>{{ customer.full_name }}</strong>
+                            </td>
+
+                            <td>{{ customer.email }}</td>
+
+                            <td>{{ customer.phone or '—' }}</td>
+
+                            <td>
+                                {% if customer.created_at %}
+                                    {{ customer.created_at.strftime('%d/%m/%Y') }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if customer.is_active %}
+                                    <span class="badge bg-success">
+                                        Đang hoạt động
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary">
+                                        Đã khóa
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'admin.customer_toggle_active',
+                                        customer_id=customer.id
+                                    ) }}"
+                                    onsubmit="return confirm('Bạn có chắc muốn thay đổi trạng thái tài khoản này?');">
+
+                                    <input
+                                        type="hidden"
+                                        name="csrf_token"
+                                        value="{{ csrf_token() }}">
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm
+                                        {% if customer.is_active %}
+                                            btn-danger
+                                        {% else %}
+                                            btn-success
+                                        {% endif %}">
+                                        {% if customer.is_active %}
+                                            Khóa tài khoản
+                                        {% else %}
+                                            Mở khóa
+                                        {% endif %}
+                                    </button>
+                                                                   
+                                    <a
+                                        href="{{ url_for('admin.customer_detail', customer_id=customer.id) }}"
+                                        class="btn btn-sm btn-outline-primary">
+                                           Chi tiết
+                                    </a>
+                                </form>
+                            </td>
+                        </tr>
+
+                        {% else %}
+                        <tr>
+                            <td colspan="7"
+                                class="text-center py-5 text-muted">
+                                {% if keyword %}
+                                    Không tìm thấy khách hàng phù hợp.
+                                {% else %}
+                                    Chưa có khách hàng nào đăng ký.
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

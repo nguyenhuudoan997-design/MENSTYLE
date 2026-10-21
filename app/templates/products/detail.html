@@ -1,0 +1,550 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} | MENSTYLE</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #222;
+            background: #f6f6f6;
+            line-height: 1.6;
+        }
+
+        header {
+            padding: 24px 7%;
+            color: white;
+            background: #111;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            color: #555;
+            text-decoration: none;
+        }
+
+        .detail-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 28px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .product-image {
+            min-height: 380px;
+            display: grid;
+            place-items: center;
+            background: #eee;
+        }
+
+        .product-image img {
+            width: 100%;
+            max-height: 480px;
+            object-fit: contain;
+        }
+
+        .placeholder {
+            color: #777;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .category {
+            color: #777;
+            font-size: 13px;
+        }
+
+        h1 {
+            font-size: 30px;
+            line-height: 1.4;
+        }
+
+        .price {
+            color: #b42318;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .old-price {
+            color: #888;
+            font-size: 16px;
+            text-decoration: line-through;
+        }
+
+        .info {
+            padding: 14px 0;
+            border-bottom: 1px solid #eee;
+            line-height: 1.8;
+        }
+
+        .add-button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 15px;
+            border: 0;
+            color: white;
+            background: #111;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .add-button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .size-section {
+            margin-top: 28px;
+            padding: 24px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .size-section h2 {
+            margin-top: 0;
+            font-size: 23px;
+        }
+
+        .section-description {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .size-table-wrapper {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .size-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .size-table th,
+        .size-table td {
+            padding: 12px 10px;
+            border: 1px solid #e5e5e5;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .size-table th {
+            color: white;
+            background: #111;
+        }
+
+        .size-table tbody tr:nth-child(even) {
+            background: #f7f7f7;
+        }
+
+        .recommend-form {
+            margin-top: 22px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            min-height: 44px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        .form-group input:focus {
+            border-color: #111;
+            outline: 2px solid #ddd;
+        }
+
+        .recommend-button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            border: 0;
+            border-radius: 5px;
+            color: white;
+            background: #111;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .recommend-button:hover {
+            background: #333;
+        }
+
+        .recommend-result {
+            margin-top: 22px;
+            padding: 18px;
+            border: 1px solid #d9e6d5;
+            border-radius: 6px;
+            background: #f4f9f1;
+        }
+
+        .recommend-result h3 {
+            margin-top: 0;
+        }
+
+        .recommended-size {
+            display: inline-block;
+            margin: 8px 0;
+            padding: 8px 18px;
+            border-radius: 5px;
+            color: white;
+            background: #243c2b;
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .notice {
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 5px;
+            color: #664d03;
+            background: #fff3cd;
+        }
+
+        .form-note {
+            color: #666;
+            font-size: 13px;
+        }
+
+        @media (max-width: 700px) {
+            main {
+                margin-top: 20px;
+                padding: 0 12px;
+            }
+
+            .detail-layout {
+                grid-template-columns: 1fr;
+                gap: 24px;
+                padding: 18px;
+            }
+
+            .product-image {
+                min-height: 260px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .size-section {
+                padding: 18px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <a href="{{ url_for('main.home') }}">
+            <strong>MENSTYLE</strong>
+        </a>
+    </header>
+
+    <main>
+        <a class="back-link"
+           href="{{ url_for('products.product_list') }}">
+            ← Quay lại danh sách sản phẩm
+        </a>
+
+        <section class="detail-layout">
+            <div class="product-image">
+                {% if product.image %}
+                    <img
+                        src="{{ url_for('static', filename=product.image) }}"
+                        alt="{{ product.name }}"
+                    >
+                {% else %}
+                    <div class="placeholder">MENSTYLE</div>
+                {% endif %}
+            </div>
+
+            <div>
+                <p class="category">{{ product.category }}</p>
+                <h1>{{ product.name }}</h1>
+
+                <p class="price">
+                    {% if product.sale_price is not none
+                          and product.sale_price < product.price %}
+                        {{ "{:,.0f}".format(product.sale_price) }} VNĐ
+                        <span class="old-price">
+                            {{ "{:,.0f}".format(product.price) }} VNĐ
+                        </span>
+                    {% else %}
+                        {{ "{:,.0f}".format(product.price) }} VNĐ
+                    {% endif %}
+                </p>
+
+                <div class="info">
+                    <strong>Chất liệu:</strong>
+                    {{ product.material or "Đang cập nhật" }}
+                </div>
+
+                <div class="info">
+                    <strong>Kích cỡ:</strong>
+                    {% if size_charts %}
+                        {% for size in size_charts %}
+                            {{ size.size_name }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {{ product.sizes or "Đang cập nhật" }}
+                    {% endif %}
+                </div>
+
+                <div class="info">
+                    <strong>Màu sắc:</strong>
+                    {{ product.colors or "Đang cập nhật" }}
+                </div>
+
+                <div class="info">
+                    <strong>Tồn kho:</strong>
+                    {{ product.stock }}
+                </div>
+
+                <div class="info">
+                    <strong>Mô tả:</strong><br>
+                    {{ product.description or "Thông tin sản phẩm đang được cập nhật." }}
+                </div>
+
+                <form method="POST"
+                      action="{{ url_for('cart.add_to_cart', product_id=product.id) }}">
+                    <input type="hidden"
+                           name="csrf_token"
+                           value="{{ csrf_token() }}">
+
+                    <button class="add-button"
+                            type="submit"
+                            {% if product.stock <= 0 %}disabled{% endif %}>
+                        THÊM VÀO GIỎ HÀNG
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <section class="size-section">
+            <h2>Gợi ý size phù hợp</h2>
+
+            <p class="section-description">
+                Nhập thông tin cơ thể để tham khảo size phù hợp với
+                bảng size riêng của sản phẩm này.
+            </p>
+
+            {% if size_charts %}
+                <h3>Bảng size của sản phẩm</h3>
+
+                <div class="size-table-wrapper">
+                    <table class="size-table">
+                        <thead>
+                            <tr>
+                                <th>Size</th>
+                                <th>Ngực (cm)</th>
+                                <th>Eo (cm)</th>
+                                <th>Mông (cm)</th>
+                                <th>Vai (cm)</th>
+                                <th>Cao (cm)</th>
+                                <th>Nặng (kg)</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for size in size_charts %}
+                                <tr>
+                                    <td><strong>{{ size.size_name }}</strong></td>
+                                    <td>{{ size.chest_cm or "—" }}</td>
+                                    <td>{{ size.waist_cm or "—" }}</td>
+                                    <td>{{ size.hip_cm or "—" }}</td>
+                                    <td>{{ size.shoulder_cm or "—" }}</td>
+                                    <td>
+                                        {% if size.height_min_cm is not none
+                                              or size.height_max_cm is not none %}
+                                            {{ size.height_min_cm or "—" }}
+                                            –
+                                            {{ size.height_max_cm or "—" }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if size.weight_min_kg is not none
+                                              or size.weight_max_kg is not none %}
+                                            {{ size.weight_min_kg or "—" }}
+                                            –
+                                            {{ size.weight_max_kg or "—" }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <form class="recommend-form" method="POST"
+                      action="{{ url_for('products.product_detail', product_id=product.id) }}">
+                    <input type="hidden"
+                           name="csrf_token"
+                           value="{{ csrf_token() }}">
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="height_cm">Chiều cao (cm) *</label>
+                            <input id="height_cm"
+                                   name="height_cm"
+                                   type="number"
+                                   min="100"
+                                   max="230"
+                                   step="0.1"
+                                   value="{{ request.form.get('height_cm', '') }}"
+                                   placeholder="Ví dụ: 170"
+                                   required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="weight_kg">Cân nặng (kg) *</label>
+                            <input id="weight_kg"
+                                   name="weight_kg"
+                                   type="number"
+                                   min="20"
+                                   max="250"
+                                   step="0.1"
+                                   value="{{ request.form.get('weight_kg', '') }}"
+                                   placeholder="Ví dụ: 65"
+                                   required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="chest_cm">Vòng ngực (cm)</label>
+                            <input id="chest_cm"
+                                   name="chest_cm"
+                                   type="number"
+                                   min="20"
+                                   max="200"
+                                   step="0.1"
+                                   value="{{ request.form.get('chest_cm', '') }}"
+                                   placeholder="Không bắt buộc">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="waist_cm">Vòng eo (cm)</label>
+                            <input id="waist_cm"
+                                   name="waist_cm"
+                                   type="number"
+                                   min="20"
+                                   max="200"
+                                   step="0.1"
+                                   value="{{ request.form.get('waist_cm', '') }}"
+                                   placeholder="Không bắt buộc">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="hip_cm">Vòng mông (cm)</label>
+                            <input id="hip_cm"
+                                   name="hip_cm"
+                                   type="number"
+                                   min="20"
+                                   max="200"
+                                   step="0.1"
+                                   value="{{ request.form.get('hip_cm', '') }}"
+                                   placeholder="Không bắt buộc">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="shoulder_cm">Ngang vai (cm)</label>
+                            <input id="shoulder_cm"
+                                   name="shoulder_cm"
+                                   type="number"
+                                   min="20"
+                                   max="200"
+                                   step="0.1"
+                                   value="{{ request.form.get('shoulder_cm', '') }}"
+                                   placeholder="Không bắt buộc">
+                        </div>
+                    </div>
+
+                    <p class="form-note">
+                        * Chiều cao và cân nặng là thông tin bắt buộc.
+                        Các số đo còn lại giúp kết quả tham khảo chính xác hơn.
+                    </p>
+
+                    <button class="recommend-button" type="submit">
+                        TƯ VẤN SIZE CHO TÔI
+                    </button>
+                </form>
+            {% else %}
+                <div class="notice">
+                    Sản phẩm này chưa có bảng size chi tiết.
+                    Chức năng gợi ý sẽ hoạt động sau khi cửa hàng bổ sung
+                    thông số cho từng size.
+                </div>
+            {% endif %}
+
+            {% if recommendation_message %}
+                <div class="recommend-result" aria-live="polite">
+                    <h3>Kết quả tư vấn</h3>
+
+                    {% if recommended_size %}
+                        <p>Size được đề xuất:</p>
+
+                        <div class="recommended-size">
+                            {{ recommended_size.size_name }}
+                        </div>
+
+                        <p>
+                            Mức độ phù hợp theo các số đo đã cung cấp:
+                            <strong>{{ recommendation_score }}%</strong>
+                        </p>
+
+                        <p class="form-note">
+                            Tỷ lệ này chỉ phản ánh mức khớp của các số đo
+                            được đối chiếu, không phải xác suất mặc vừa.
+                        </p>
+                    {% endif %}
+
+                    <p>{{ recommendation_message }}</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,84 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h2 class="mb-2">Sửa thông tin nhân viên</h2>
+                    <p class="text-muted mb-4">
+                        Cập nhật thông tin tài khoản nhân viên MENSTYLE.
+                    </p>
+
+                    <form method="POST"
+                          action="{{ url_for('admin.employee_edit', employee_id=employee.id) }}">
+
+                        <input type="hidden"
+                               name="csrf_token"
+                               value="{{ csrf_token() }}">
+
+                        <div class="mb-3">
+                            <label for="full_name" class="form-label">
+                                Họ và tên
+                            </label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="full_name"
+                                name="full_name"
+                                maxlength="150"
+                                value="{{ employee.full_name }}"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                Email đăng nhập
+                            </label>
+                            <input
+                                type="email"
+                                class="form-control"
+                                id="email"
+                                name="email"
+                                maxlength="150"
+                                value="{{ employee.email }}"
+                                required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="phone" class="form-label">
+                                Số điện thoại
+                            </label>
+                            <input
+                                type="tel"
+                                class="form-control"
+                                id="phone"
+                                name="phone"
+                                maxlength="20"
+                                value="{{ employee.phone or '' }}">
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                Lưu thay đổi
+                            </button>
+
+                            <a href="{{ url_for('admin.employee_list') }}"
+                               class="btn btn-outline-secondary">
+                                Quay lại danh sách
+                            </a>
+
+                            <a href="{{ url_for('admin.dashboard') }}"
+                               class="btn btn-outline-dark">
+                                Trang quản trị
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

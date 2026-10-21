@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký | MENSTYLE</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px 16px;
+            background: #f5f5f5;
+            color: #171717;
+            font-family: Arial, sans-serif;
+        }
+
+        .register-box {
+            width: 100%;
+            max-width: 460px;
+            margin: 30px auto;
+            padding: 32px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            text-align: center;
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            margin-bottom: 28px;
+            color: #666;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin: 16px 0 7px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 0;
+            font-size: 15px;
+        }
+
+        input:focus {
+            border-color: #111;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 14px;
+            border: 1px solid #111;
+            background: #111;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #333;
+        }
+
+        .message {
+            margin: 12px 0;
+            padding: 10px;
+            background: #f1f1f1;
+            font-size: 14px;
+        }
+
+        .footer {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        a {
+            color: #111;
+        }
+    </style>
+</head>
+<body>
+    <main class="register-box">
+        <h1>MENSTYLE</h1>
+        <p class="subtitle">TẠO TÀI KHOẢN CỦA BẠN</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="message">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth.register') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label for="full_name">Họ và tên</label>
+            <input
+                type="text"
+                id="full_name"
+                name="full_name"
+                maxlength="150"
+                autocomplete="name"
+                required
+            >
+
+            <label for="email">Email</label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                maxlength="150"
+                autocomplete="email"
+                required
+            >
+
+            <label for="phone">Số điện thoại</label>
+            <input
+                type="tel"
+                id="phone"
+                name="phone"
+                maxlength="20"
+                autocomplete="tel"
+            >
+
+            <label for="password">Mật khẩu (ít nhất 8 ký tự)</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+            >
+
+            <label for="confirm_password">Nhập lại mật khẩu</label>
+            <input
+                type="password"
+                id="confirm_password"
+                name="confirm_password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+            >
+
+            <button type="submit">ĐĂNG KÝ</button>
+        </form>
+
+        <p class="footer">
+            Đã có tài khoản?
+            <a href="{{ url_for('auth.login') }}">Đăng nhập</a>
+            <br><br>
+            <a href="{{ url_for('main.home') }}">Quay lại trang chủ</a>
+        </p>
+    </main>
+</body>
+</html>

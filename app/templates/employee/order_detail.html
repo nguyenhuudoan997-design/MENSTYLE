@@ -1,0 +1,307 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết đơn hàng - MENSTYLE</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 24px;
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px #00000010;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #17202a;
+            color: white;
+        }
+
+        a {
+            color: #155eef;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .amount {
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #e8f0fe;
+            color: #174ea6;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin: 16px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        select {
+            width: 100%;
+            max-width: 350px;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: white;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 11px 18px;
+            background: #17202a;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #34495e;
+        }
+
+        .notice {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <h1>Chi tiết đơn hàng</h1>
+
+        <a class="back-link"
+           href="{{ url_for('employee.order_list') }}">
+            ← Quay lại danh sách đơn hàng
+        </a>
+
+        <!-- THÔNG TIN ĐƠN HÀNG -->
+        <section class="card">
+            <h2>Thông tin đơn hàng</h2>
+
+            <p>
+                <strong>Mã đơn:</strong>
+                {{ order.order_code }}
+            </p>
+
+            <p>
+                <strong>Ngày đặt:</strong>
+                {{ order.created_at.strftime('%d/%m/%Y %H:%M')
+                   if order.created_at else 'Chưa có thông tin' }}
+            </p>
+
+            <p>
+                <strong>Trạng thái:</strong>
+                <span class="status">{{ order.order_status }}</span>
+            </p>
+
+            <p>
+                <strong>Thanh toán:</strong>
+                {{ order.payment_status }}
+            </p>
+
+            <p>
+                <strong>Phương thức thanh toán:</strong>
+                {{ order.payment_method }}
+            </p>
+
+            <p>
+                <strong>Tổng tiền:</strong>
+                <span class="amount">
+                    {{ "{:,.0f}".format(order.total_amount or 0) }} đ
+                </span>
+            </p>
+        </section>
+
+        <!-- CẬP NHẬT TRẠNG THÁI -->
+        <section class="card">
+            <h2>Xử lý đơn hàng</h2>
+
+            {% if allowed_statuses %}
+                <p class="notice">
+                    Chọn trạng thái tiếp theo phù hợp với tiến trình xử lý đơn hàng.
+                </p>
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'employee.order_update_status',
+                        order_id=order.id
+                    ) }}"
+                >
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+
+                    <div class="form-group">
+                        <label for="order_status">
+                            Trạng thái tiếp theo
+                        </label>
+
+                        <select
+                            id="order_status"
+                            name="order_status"
+                            required
+                        >
+                            {% for status in allowed_statuses %}
+                                <option value="{{ status }}">
+                                    {{ status }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit">
+                        Cập nhật trạng thái
+                    </button>
+                </form>
+            {% else %}
+                <p class="notice">
+                    Đơn hàng hiện không còn trạng thái tiếp theo
+                    dành cho nhân viên.
+                </p>
+            {% endif %}
+        </section>
+
+        <!-- THÔNG TIN NGƯỜI NHẬN -->
+        <section class="card">
+            <h2>Thông tin người nhận</h2>
+
+            <p>
+                <strong>Họ tên:</strong>
+                {{ order.recipient_name }}
+            </p>
+
+            <p>
+                <strong>Điện thoại:</strong>
+                {{ order.recipient_phone }}
+            </p>
+
+            <p>
+                <strong>Email:</strong>
+                {{ order.recipient_email or 'Không có' }}
+            </p>
+
+            <p>
+                <strong>Địa chỉ:</strong>
+                {{ order.shipping_address }}
+            </p>
+
+            <p>
+                <strong>Ghi chú:</strong>
+                {{ order.note or 'Không có' }}
+            </p>
+        </section>
+
+        <!-- DANH SÁCH SẢN PHẨM -->
+        <section class="card">
+            <h2>Sản phẩm trong đơn hàng</h2>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th>Số lượng</th>
+                            <th>Đơn giá</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in order.items %}
+                            <tr>
+                                <td>{{ item.product_name }}</td>
+
+                                <td>{{ item.quantity }}</td>
+
+                                <td>
+                                    {{ "{:,.0f}".format(item.unit_price or 0) }} đ
+                                </td>
+
+                                <td>
+                                    {{ "{:,.0f}".format(item.subtotal or 0) }} đ
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4">
+                                    Đơn hàng chưa có sản phẩm.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

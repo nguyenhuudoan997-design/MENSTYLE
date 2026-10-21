@@ -1,0 +1,389 @@
+
+{% extends "base.html" %}
+
+{% block title %}Báo cáo doanh thu | MENSTYLE{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Tiêu đề -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="mb-1">Báo cáo doanh thu</h1>
+            <p class="text-muted mb-0">
+                Theo dõi các khoản thanh toán thành công của MENSTYLE.
+            </p>
+        </div>
+
+        <a href="{{ url_for('admin.dashboard') }}"
+           class="btn btn-outline-secondary">
+            Quay lại trang quản trị
+        </a>
+    </div>
+    
+    <!-- Nút xuất báo cáo Excel -->
+    <div class="mb-4">
+        <a href="{{ url_for(
+           'admin.export_revenue_report',
+            period=period,
+            start_date=start_date,
+            end_date=end_date
+        ) }}"
+            class="btn btn-success">
+               <i class="bi bi-file-earmark-excel"></i>
+               Xuất báo cáo Excel
+        </a>
+    </div>
+
+    <!-- Thông báo lỗi ngày -->
+    {% if date_error %}
+    <div class="alert alert-danger">
+        {{ date_error }}
+    </div>
+    {% endif %}
+
+    <!-- Bộ lọc thời gian -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <strong>Lọc thời gian</strong>
+        </div>
+
+        <div class="card-body">
+
+            <!-- Bộ lọc nhanh -->
+            <div class="mb-4">
+                <label class="form-label fw-bold">
+                    Lọc nhanh theo thời gian
+                </label>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ url_for('admin.revenue_report') }}"
+                       class="btn btn-outline-secondary">
+                        Tất cả
+                    </a>
+
+                    <a href="{{ url_for('admin.revenue_report', period='today') }}"
+                       class="btn {% if period == 'today' %}btn-success{% else %}btn-outline-success{% endif %}">
+                        Hôm nay
+                    </a>
+
+                    <a href="{{ url_for('admin.revenue_report', period='last7') }}"
+                       class="btn {% if period == 'last7' %}btn-success{% else %}btn-outline-success{% endif %}">
+                        7 ngày qua
+                    </a>
+
+                    <a href="{{ url_for('admin.revenue_report', period='this_month') }}"
+                       class="btn {% if period == 'this_month' %}btn-success{% else %}btn-outline-success{% endif %}">
+                        Tháng này
+                    </a>
+
+                    <a href="{{ url_for('admin.revenue_report', period='this_year') }}"
+                       class="btn {% if period == 'this_year' %}btn-success{% else %}btn-outline-success{% endif %}">
+                        Năm nay
+                    </a>
+                </div>
+            </div>
+
+            <!-- Lọc theo ngày tùy chọn -->
+            <form method="GET"
+                  action="{{ url_for('admin.revenue_report') }}">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-12 col-md-5">
+                        <label for="start_date" class="form-label">
+                            Từ ngày
+                        </label>
+
+                        <input type="date"
+                               class="form-control"
+                               id="start_date"
+                               name="start_date"
+                               value="{{ start_date }}">
+                    </div>
+
+                    <div class="col-12 col-md-5">
+                        <label for="end_date" class="form-label">
+                            Đến ngày
+                        </label>
+
+                        <input type="date"
+                               class="form-control"
+                               id="end_date"
+                               name="end_date"
+                               value="{{ end_date }}">
+                    </div>
+
+                    <div class="col-12 col-md-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            Lọc
+                        </button>
+
+                        <a href="{{ url_for('admin.revenue_report') }}"
+                           class="btn btn-outline-secondary">
+                            Xóa
+                        </a>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Các thẻ thống kê -->
+    <div class="row g-3 mb-4">
+
+        <!-- Tổng doanh thu -->
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Tổng doanh thu</p>
+
+                    <h3 class="text-success mb-0">
+                        {{ "{:,.0f}".format(total_revenue|float) }} đ
+                    </h3>
+
+                    <small class="text-muted">
+                        Chỉ tính khoản thanh toán thành công
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Số đơn đã thanh toán -->
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Đơn có thanh toán</p>
+                    <h3 class="mb-0">{{ paid_order_count }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Số đơn hoàn thành -->
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Đơn hoàn thành</p>
+                    <h3 class="mb-0">{{ completed_orders }}</h3>
+
+                    <small class="text-muted">
+                        Lọc theo ngày tạo đơn
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doanh thu trung bình -->
+        <div class="col-12 col-md-6 col-xl-3">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <p class="text-muted mb-2">
+                        Doanh thu trung bình / đơn
+                    </p>
+
+                    <h3 class="mb-0">
+                        {{ "{:,.0f}".format(average_order_value|float) }} đ
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Biểu đồ doanh thu theo ngày -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <strong>Doanh thu theo ngày</strong>
+        </div>
+
+        <div class="card-body">
+            {% if daily_labels %}
+            <div style="position: relative; height: 320px;">
+                <canvas id="dailyRevenueChart"></canvas>
+            </div>
+            {% else %}
+            <p class="text-muted text-center mb-0 py-4">
+                Chưa có dữ liệu thanh toán trong khoảng thời gian này.
+            </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Biểu đồ doanh thu theo tháng -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <strong>Doanh thu theo tháng</strong>
+        </div>
+
+        <div class="card-body">
+            {% if monthly_labels %}
+            <div style="position: relative; height: 320px;">
+                <canvas id="monthlyRevenueChart"></canvas>
+            </div>
+            {% else %}
+            <p class="text-muted text-center mb-0 py-4">
+                Chưa có dữ liệu thanh toán trong khoảng thời gian này.
+            </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Bảng chi tiết thanh toán -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <strong>Chi tiết thanh toán thành công</strong>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Phương thức</th>
+                        <th class="text-end">Số tiền</th>
+                        <th>Thời điểm thanh toán</th>
+                        <th>Trạng thái đơn</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for(
+                                'admin.order_detail',
+                                order_id=payment.order_id
+                            ) }}">
+                                {{ payment.order.order_code }}
+                            </a>
+                        </td>
+
+                        <td>{{ payment.payment_method }}</td>
+
+                        <td class="text-end text-nowrap">
+                            {{ "{:,.0f}".format(payment.amount|float) }} đ
+                        </td>
+
+                        <td>
+                            {% if payment.paid_at %}
+                                {{ payment.paid_at.strftime('%d/%m/%Y %H:%M') }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>{{ payment.order.order_status }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            Không có khoản thanh toán thành công trong khoảng thời gian này.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const dailyLabels = {{ daily_labels | tojson }};
+    const dailyValues = {{ daily_values | tojson }};
+    const monthlyLabels = {{ monthly_labels | tojson }};
+    const monthlyValues = {{ monthly_values | tojson }};
+
+    function createRevenueChart(canvasId, labels, values, chartType) {
+        const canvas = document.getElementById(canvasId);
+
+        if (!canvas || labels.length === 0) {
+            return;
+        }
+
+        new Chart(canvas, {
+            type: chartType,
+
+            data: {
+                labels: labels,
+
+                datasets: [{
+                    label: "Doanh thu (VNĐ)",
+                    data: values,
+                    borderColor: "#198754",
+
+                    backgroundColor: chartType === "bar"
+                        ? "rgba(25, 135, 84, 0.65)"
+                        : "rgba(25, 135, 84, 0.15)",
+
+                    borderWidth: 2,
+                    fill: chartType === "line",
+                    tension: 0.3,
+                    pointRadius: 4
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                interaction: {
+                    intersect: false,
+                    mode: "index"
+                },
+
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return new Intl.NumberFormat("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND",
+                                    maximumFractionDigits: 0
+                                }).format(context.parsed.y);
+                            }
+                        }
+                    }
+                },
+
+                scales: {
+                    y: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            callback: function (value) {
+                                return new Intl.NumberFormat("vi-VN")
+                                    .format(value) + " đ";
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    createRevenueChart(
+        "dailyRevenueChart",
+        dailyLabels,
+        dailyValues,
+        "line"
+    );
+
+    createRevenueChart(
+        "monthlyRevenueChart",
+        monthlyLabels,
+        monthlyValues,
+        "bar"
+    );
+});
+</script>
+{% endblock %}

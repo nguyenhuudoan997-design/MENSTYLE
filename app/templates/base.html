@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}MENSTYLE - Thời trang nam{% endblock %}</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        body {
+            background: #f5f6f8;
+            color: #222;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .navbar .nav-link {
+            transition: color 0.2s ease;
+        }
+
+        .navbar .nav-link:hover {
+            color: #ffc107;
+        }
+
+        main {
+            min-height: 70vh;
+        }
+
+        footer {
+            background: #212529;
+            color: white;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+    </style>
+
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+
+            <a class="navbar-brand" href="{{ url_for('main.home') }}">
+                MENSTYLE
+            </a>
+
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar"
+                aria-expanded="false"
+                aria-label="Mở menu"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.home') }}">
+                            Trang chủ
+                        </a>
+                    </li>
+
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <span class="nav-link text-warning">
+                            DEBUG: authenticated={{ current_user.is_authenticated }},
+                            role={{ current_user.role }}
+                        </span>
+                    </li>
+
+                        {% if current_user.role == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+                                    Quản trị
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.product_list') }}">
+                                    Sản phẩm
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.order_list') }}">
+                                    Đơn hàng
+                                </a>
+                            </li>
+
+                        {% elif current_user.role == 'employee' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('employee.dashboard') }}">
+                                    Khu vực nhân viên
+                                </a>
+                            </li>
+
+                        {% elif current_user.role == 'customer' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('account.profile') }}">
+                                    Tài khoản của tôi
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        <li class="nav-item">
+                            <span class="nav-link text-light">
+                                Xin chào, {{ current_user.full_name }}
+                            </span>
+                        </li>
+
+                        <li class="nav-item">
+                            <form method="POST"
+                                  action="{{ url_for('auth.logout') }}"
+                                  class="d-inline">
+                                <input type="hidden"
+                                    name="csrf_token"
+                                    value="{{ csrf_token() }}">
+                                <button type="submit"
+                                        class="btn btn-outline-light btn-sm ms-lg-2 my-1">
+                                            Đăng xuất
+                                </button>
+                            </form>
+                        </li>
+
+                    {% else %}
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.login') }}">
+                                Đăng nhập
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-warning btn-sm ms-lg-2 my-1"
+                               href="{{ url_for('auth.register') }}">
+                                Đăng ký
+                            </a>
+                        </li>
+
+                    {% endif %}
+
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container pt-3">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div
+                            class="alert
+                            {% if category == 'success' %}
+                                alert-success
+                            {% elif category in ['error', 'danger'] %}
+                                alert-danger
+                            {% elif category == 'warning' %}
+                                alert-warning
+                            {% else %}
+                                alert-info
+                            {% endif %}
+                            alert-dismissible fade show"
+                            role="alert"
+                        >
+                            {{ message }}
+
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="alert"
+                                aria-label="Đóng"
+                            ></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container text-center">
+            <p class="mb-0">
+                &copy; 2026 MENSTYLE - Thời trang nam
+            </p>
+        </div>
+    </footer>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

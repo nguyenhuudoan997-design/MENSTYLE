@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sản phẩm | MENSTYLE</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #222;
+            background: #f5f5f5;
+        }
+
+        header {
+            padding: 24px 7%;
+            color: white;
+            background: #111;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .search-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 24px 0;
+        }
+
+        input,
+        select,
+        button {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        button {
+            color: white;
+            background: #111;
+            cursor: pointer;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            padding: 20px;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .product-card img {
+            display: block;
+            width: 100%;
+            height: 220px;
+            object-fit: contain;
+            background: #f5f5f5;
+        }
+
+        .placeholder {
+            height: 220px;
+            display: grid;
+            place-items: center;
+            background: #eee;
+            color: #777;
+        }
+
+        .product-detail-link {
+            display: block;
+            text-decoration: none;
+        }
+
+        .product-detail-link img {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .product-detail-link:hover img {
+            transform: scale(1.03);
+        }
+
+        .product-name-link {
+            color: #222;
+            text-decoration: none;
+        }
+
+        .product-name-link:hover {
+            color: #b42318;
+        }
+
+        .price {
+            color: #b42318;
+            font-weight: bold;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .add-cart-form {
+            margin-top: 14px;
+        }
+
+        .add-cart-button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #111;
+            border-radius: 4px;
+            background: #111;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .add-cart-button:hover:not(:disabled) {
+            background: #fff;
+            color: #111;
+        }
+
+        .add-cart-button:disabled {
+            background: #ddd;
+            color: #777;
+            border-color: #ddd;
+            cursor: not-allowed;
+        }
+
+        .empty-message {
+            grid-column: 1 / -1;
+            padding: 30px;
+            text-align: center;
+            background: white;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 600px) {
+            main {
+                margin-top: 24px;
+                padding: 0 14px;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .product-card {
+                padding: 12px;
+            }
+
+            .product-card img,
+            .placeholder {
+                height: 160px;
+            }
+
+            .add-cart-button {
+                font-size: 12px;
+                padding: 10px 6px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>
+            <a href="{{ url_for('main.home') }}">MENSTYLE</a>
+        </h1>
+        <p>Thời trang nam hiện đại</p>
+    </header>
+
+    <main>
+        <a class="back-link" href="{{ url_for('main.home') }}">
+            ← Trở về trang chủ
+        </a>
+
+        <h2>Tất cả sản phẩm</h2>
+
+        <form
+            class="search-form"
+            method="GET"
+            action="{{ url_for('products.product_list') }}"
+        >
+            <input
+                type="search"
+                name="q"
+                value="{{ query }}"
+                placeholder="Nhập tên sản phẩm..."
+                aria-label="Tìm kiếm sản phẩm"
+            >
+
+            <select name="category" aria-label="Danh mục">
+                <option value="">Tất cả danh mục</option>
+
+                <option
+                    value="Áo"
+                    {% if category == "Áo" %}selected{% endif %}
+                >
+                    Áo nam
+                </option>
+
+                <option
+                    value="Quần"
+                    {% if category == "Quần" %}selected{% endif %}
+                >
+                    Quần nam
+                </option>
+            </select>
+
+            <button type="submit">Tìm kiếm</button>
+        </form>
+
+        <p>Tìm thấy {{ products|length }} sản phẩm.</p>
+
+        <div class="product-grid">
+            {% for product in products %}
+                <article class="product-card">
+
+                    <!-- Ảnh sản phẩm: bấm để xem chi tiết -->
+                    <a
+                        href="{{ url_for('products.product_detail', product_id=product.id) }}"
+                        class="product-detail-link"
+                    >
+                        {% if product.image %}
+                            <img
+                                src="{{ url_for('static', filename=product.image) }}"
+                                alt="{{ product.name }}"
+                                loading="lazy"
+                            >
+                        {% else %}
+                            <div class="placeholder">MENSTYLE</div>
+                        {% endif %}
+                    </a>
+
+                    <p>{{ product.category }}</p>
+
+                    <!-- Tên sản phẩm: bấm để xem chi tiết -->
+                    <h3>
+                        <a
+                            class="product-name-link"
+                            href="{{ url_for('products.product_detail', product_id=product.id) }}"
+                        >
+                            {{ product.name }}
+                        </a>
+                    </h3>
+
+                    <p class="price">
+                        {% if product.sale_price and product.sale_price < product.price %}
+                            {{ "{:,.0f}".format(product.sale_price) }} VNĐ
+                        {% else %}
+                            {{ "{:,.0f}".format(product.price) }} VNĐ
+                        {% endif %}
+                    </p>
+
+                    <p>Tồn kho: {{ product.stock }}</p>
+
+                    <!-- Nút thêm sản phẩm vào giỏ hàng -->
+                    <form
+                        method="POST"
+                        action="{{ url_for('cart.add_to_cart', product_id=product.id) }}"
+                        class="add-cart-form"
+                    >
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button
+                            type="submit"
+                            class="add-cart-button"
+                            {% if product.stock <= 0 %}disabled{% endif %}
+                        >
+                            {% if product.stock <= 0 %}
+                                HẾT HÀNG
+                            {% else %}
+                                THÊM VÀO GIỎ HÀNG
+                            {% endif %}
+                        </button>
+                    </form>
+
+                </article>
+            {% else %}
+                <p class="empty-message">
+                    Không tìm thấy sản phẩm phù hợp.
+                </p>
+            {% endfor %}
+        </div>
+    </main>
+</body>
+</html>

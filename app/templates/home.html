@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MENSTYLE | Thời trang nam</title>
+    <meta
+        name="description"
+        content="MENSTYLE - Thời trang nam hiện đại, tối giản và phong cách."
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/home.css') }}"
+    >
+    <script
+        src="{{ url_for('static', filename='js/home.js') }}"
+        defer
+    ></script>
+</head>
+
+<body>
+    <div class="announcement">
+        MENSTYLE — PHONG CÁCH CỦA RIÊNG BẠN
+    </div>
+
+    <header class="header">
+        <a class="logo" href="{{ url_for('main.home') }}">
+            MEN<span>STYLE</span>
+        </a>
+
+        <form
+            class="search-form"
+            action="{{ url_for('products.product_list') }}"
+            method="GET"
+        >
+            <input
+                type="search"
+                name="q"
+                placeholder="Tìm kiếm sản phẩm..."
+                aria-label="Tìm kiếm sản phẩm"
+            >
+            <button type="submit" aria-label="Tìm kiếm">⌕</button>
+        </form>
+        
+        <nav class="header-actions" aria-label="Tài khoản">
+            {% if current_user.is_authenticated %}
+
+                <span class="account-name">
+                    Xin chào, {{ current_user.full_name }}
+                </span>
+
+            {% if current_user.role == 'customer' %}
+                <a href="{{ url_for('account.profile') }}">
+                    Tài khoản của tôi
+                </a>
+            {% elif current_user.role == 'admin' %}
+                <a href="{{ url_for('admin.dashboard') }}">
+                    Quản trị
+                </a>
+            {% elif current_user.role == 'employee' %}
+                <a href="{{ url_for('employee.dashboard') }}">
+                    Khu vực nhân viên
+                </a>
+            {% endif %}
+
+            <form
+                method="POST"
+                action="{{ url_for('auth.logout') }}"
+                class="logout-form"
+            >
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+                <button type="submit" class="logout-button">
+                    Đăng xuất
+                </button>
+            </form>
+
+        {% else %}
+            <a href="{{ url_for('auth.login') }}">Đăng nhập</a>
+            <a href="{{ url_for('auth.register') }}">Đăng ký</a>
+        {% endif %}
+
+        <a href="{{ url_for('cart.view_cart') }}">Giỏ hàng</a>
+    </nav>
+
+    </header>
+
+    <nav class="main-nav" aria-label="Điều hướng chính">
+        <a class="active" href="{{ url_for('main.home') }}">
+            TRANG CHỦ
+        </a>
+        <a href="{{ url_for('products.product_list') }}">
+            TẤT CẢ SẢN PHẨM
+        </a>
+        <a href="{{ url_for('products.product_list', category='Áo') }}">
+            ÁO NAM
+        </a>
+        <a href="{{ url_for('products.product_list', category='Quần') }}">
+            QUẦN NAM
+        </a>
+        <a href="#featured">SẢN PHẨM NỔI BẬT</a>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <p class="eyebrow">MENSTYLE / NEW COLLECTION</p>
+
+                <h1>
+                    ĐƠN GIẢN<br>
+                    TẠO NÊN<br>
+                    <span>KHÁC BIỆT.</span>
+                </h1>
+
+                <p class="hero-description">
+                    Khám phá phong cách nam hiện đại.
+                    Tự tin trong từng lựa chọn.
+                </p>
+
+                <a
+                    class="button button-light"
+                    href="{{ url_for('products.product_list') }}"
+                >
+                    KHÁM PHÁ SẢN PHẨM
+                    <span aria-hidden="true">→</span>
+                </a>
+            </div>
+
+            <div class="hero-art">
+                <img class="hero-image"
+                    src="{{ url_for('static', filename='images/hero-menswear.jpg') }}"
+                    alt="Bộ sưu tập thời trang nam MENSTYLE"
+                >
+
+                <div class="hero-image-overlay"></div>
+
+                <div class="art-label">
+                    LESS<br>IS MORE.
+                </div>
+
+                <div class="art-caption">
+                    MODERN MENSWEAR<br>
+                    EST. MENSTYLE
+                </div>
+            </div>
+
+            <div class="hero-index">01 / 03</div>
+        </section>
+
+        <section class="categories section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">CHỌN PHONG CÁCH</p>
+                    <h2>Danh mục sản phẩm</h2>
+                </div>
+                <span class="muted">
+                    THIẾT KẾ CHO NAM GIỚI HIỆN ĐẠI
+                </span>
+            </div>
+
+            <div class="category-grid">
+                <a
+                    class="category-card category-shirt"
+                    href="{{ url_for('products.product_list', category='Áo') }}"
+                >
+                    <span class="category-number">01</span>
+                    <span class="category-name">ÁO NAM</span>
+                    <span class="category-arrow">↗</span>
+                </a>
+
+                <a
+                    class="category-card category-pants"
+                    href="{{ url_for('products.product_list', category='Quần') }}"
+                >
+                    <span class="category-number">02</span>
+                    <span class="category-name">QUẦN NAM</span>
+                    <span class="category-arrow">↗</span>
+                </a>
+
+                <a
+                    class="category-card category-style"
+                    href="{{ url_for('products.product_list') }}"
+                >
+                    <span class="category-number">03</span>
+                    <span class="category-name">TẤT CẢ SẢN PHẨM</span>
+                    <span class="category-arrow">↗</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="featured section" id="featured">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">LỰA CHỌN DÀNH CHO BẠN</p>
+                    <h2>Sản phẩm nổi bật</h2>
+                </div>
+
+                <a
+                    class="text-link"
+                    href="{{ url_for('products.product_list') }}"
+                >
+                    XEM TẤT CẢ →
+                </a>
+            </div>
+
+            <div class="product-grid">
+                {% for product in products %}
+                    <article class="product-card">
+                        <div class="product-image">
+                            {% if product.image %}
+                                <img
+                                    src="{{ url_for('static', filename=product.image) }}"
+                                    alt="{{ product.name }}"
+                                    loading="lazy"
+                                >
+                            {% else %}
+                                <div class="image-placeholder">
+                                    <span>MENSTYLE</span>
+                                    <span class="placeholder-line"></span>
+                                    <span class="placeholder-category">
+                                        {{ product.category }}
+                                    </span>
+                                </div>
+                            {% endif %}
+
+                            {% if product.sale_price %}
+                                <span class="product-badge">SALE</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="product-info">
+                            <p class="product-category">
+                                {{ product.category }}
+                            </p>
+
+                            <h3>{{ product.name }}</h3>
+
+                            <div class="product-prices">
+                                {% if product.sale_price %}
+                                    <span class="sale-price">
+                                        {{ "{:,.0f}".format(product.sale_price) }}₫
+                                    </span>
+                                    <span class="old-price">
+                                        {{ "{:,.0f}".format(product.price) }}₫
+                                    </span>
+                                {% else %}
+                                    <span class="sale-price">
+                                        {{ "{:,.0f}".format(product.price) }}₫
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <p class="stock">
+                                {% if product.stock > 0 %}
+                                    Còn {{ product.stock }} sản phẩm
+                                {% else %}
+                                    Tạm hết hàng
+                                {% endif %}
+                            </p>
+                        </div>
+                    </article>
+                {% else %}
+                    <p>Hiện chưa có sản phẩm nào.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="brand-message">
+            <p class="eyebrow">OUR PHILOSOPHY</p>
+            <h2>
+                Mặc điều bạn thích.<br>
+                <span>Là chính bạn.</span>
+            </h2>
+            <a
+                class="button button-dark"
+                href="{{ url_for('products.product_list') }}"
+            >
+                MUA SẮM NGAY →
+            </a>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <a class="logo logo-footer" href="{{ url_for('main.home') }}">
+            MEN<span>STYLE</span>
+        </a>
+
+        <p>Thời trang nam hiện đại · Tối giản · Tự tin</p>
+        <p class="copyright">
+            © 2026 MENSTYLE. All rights reserved.
+        </p>
+    </footer>
+</body>
+</html>

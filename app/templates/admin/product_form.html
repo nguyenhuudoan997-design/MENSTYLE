@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ 'Sửa sản phẩm' if product else 'Thêm sản phẩm' }} | MENSTYLE</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 30px 16px;
+            font-family: Arial, sans-serif;
+            background: #f5f6f8;
+            color: #222;
+        }
+
+        .container {
+            max-width: 760px;
+            margin: auto;
+            padding: 28px;
+            background: white;
+            border-radius: 12px;
+        }
+
+        h1 { margin-top: 0; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .field { margin-bottom: 16px; }
+
+        .full-width { grid-column: 1 / -1; }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font: inherit;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: 0;
+            border-radius: 6px;
+            background: #202020;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        a { color: #333; }
+
+        .message { margin-bottom: 16px; }
+
+        @media (max-width: 560px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: auto; }
+            .container { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <h1>{{ 'Sửa sản phẩm' if product else 'Thêm sản phẩm mới' }}</h1>
+        <p>Nhập thông tin sản phẩm cần đưa vào cửa hàng.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <p class="message">{{ message }}</p>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-grid">
+                <div class="field full-width">
+                    <label for="name">Tên sản phẩm *</label>
+                    <input id="name" name="name" required maxlength="200"
+                           value="{{ product.name if product else '' }}">
+                </div>
+
+                <div class="field">
+                    <label for="category">Danh mục *</label>
+                    <input id="category" name="category" required maxlength="100"
+                           placeholder="Áo sơ mi, Áo thun..."
+                           value="{{ product.category if product else '' }}">
+                </div>
+
+                <div class="field">
+                    <label for="material">Chất liệu</label>
+                    <input id="material" name="material" maxlength="200"
+                           value="{{ product.material or '' if product else '' }}">
+                </div>
+
+                <div class="field">
+                    <label for="price">Giá gốc (VNĐ) *</label>
+                    <input id="price" name="price" type="number" min="0"
+                           step="0.01" required
+                           value="{{ product.price if product else '' }}">
+                </div>
+
+                <div class="field">
+                    <label for="sale_price">Giá khuyến mãi (VNĐ)</label>
+                    <input id="sale_price" name="sale_price" type="number"
+                           min="0" step="0.01"
+                           value="{{ product.sale_price if product and product.sale_price is not none else '' }}">
+                </div>
+
+                <div class="field">
+                    <label for="stock">Số lượng tồn kho *</label>
+                    <input id="stock" name="stock" type="number" min="0"
+                           step="1" required
+                           value="{{ product.stock if product else 0 }}">
+                </div>
+
+                <div class="field">
+                    <label for="sizes">Kích cỡ</label>
+                    <input id="sizes" name="sizes"
+                           value="{{ product.sizes or '' if product else '' }}">
+                </div>
+
+                <div class="field">
+                    <label for="colors">Màu sắc</label>
+                    <input id="colors" name="colors"
+                    value="{{ product.colors or '' if product else '' }}">
+                </div>
+
+                <div class="field full-width">
+                    <label for="image">Đường dẫn ảnh trong static</label>
+                    <input id="image" name="image"
+                           placeholder="images/products/ao-moi.jpg"
+                           value="{{ product.image or '' if product else '' }}">
+                </div>
+
+                <div class="field full-width">
+                    <label for="description">Mô tả sản phẩm</label>
+                    <textarea id="description" name="description">{{ product.description or '' if product else '' }}</textarea>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="submit">
+                    {{ 'Lưu thay đổi' if product else 'Lưu sản phẩm' }}
+                </button>
+                <a href="{{ url_for('admin.product_list') }}">Hủy</a>
+            </div>
+        </form>
+    </main>
+</body>
+</html>

@@ -1,0 +1,92 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <h2>Quản lý nhân viên</h2>
+
+    <p>Admin có thể theo dõi và quản lý tài khoản nhân viên tại đây.</p>
+
+    <div class="d-flex flex-wrap gap-2 mb-3">
+        <a href="{{ url_for('admin.dashboard') }}"
+           class="btn btn-outline-secondary">
+            ← Trang quản trị
+        </a>
+
+        <a href="{{ url_for('admin.employee_add') }}"
+           class="btn btn-primary">
+            + Thêm nhân viên
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Họ tên</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for employee in employees %}
+                <tr>
+                    <td>{{ employee.id }}</td>
+                    <td>{{ employee.full_name }}</td>
+                    <td>{{ employee.email }}</td>
+                    <td>{{ employee.phone or '—' }}</td>
+                    <td>
+                        {% if employee.is_active %}
+                            <span class="badge bg-success">Đang hoạt động</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Đã khóa</span>
+                        {% endif %}
+                    </td>
+                    
+                    <td>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a
+                                href="{{ url_for('admin.employee_edit', employee_id=employee.id) }}"
+                                class="btn btn-sm btn-primary">
+                                Sửa
+                            </a>
+
+                            <form
+                                method="POST"
+                                action="{{ url_for('admin.employee_toggle_active', employee_id=employee.id) }}">
+
+                                <input
+                                    type="hidden"
+                                    name="csrf_token"
+                                    value="{{ csrf_token() }}">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-sm {% if employee.is_active %}btn-danger{% else %}btn-success{% endif %}">
+                                    {% if employee.is_active %}
+                                        Khóa tài khoản
+                                    {% else %}
+                                        Mở khóa
+                                    {% endif %}
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center">
+                        Chưa có nhân viên nào.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

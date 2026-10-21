@@ -1,0 +1,30 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+
+# Môi trường ảo
+.venv/
+venv/
+
+# Thông tin bí mật
+.env
+.env.*
+!.env.example
+
+# Flask và kiểm thử
+instance/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# File log và file tạm
+*.log
+*.tmp
+
+# IDE và hệ điều hành
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

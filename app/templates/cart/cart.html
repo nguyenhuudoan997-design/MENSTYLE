@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ hàng | MENSTYLE</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #222;
+            background: #f5f5f5;
+        }
+
+        header {
+            padding: 24px 7%;
+            background: #111;
+            color: white;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        header h1 {
+            margin: 0;
+            letter-spacing: 2px;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 12px;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 6px;
+        }
+
+        .cart-item h3 {
+            margin-top: 0;
+        }
+
+        .price {
+            font-weight: bold;
+        }
+
+        input {
+            width: 75px;
+            padding: 9px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button,
+        .button {
+            display: inline-block;
+            padding: 11px 16px;
+            border: 0;
+            border-radius: 4px;
+            color: white;
+            background: #111;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        button:hover,
+        .button:hover {
+            background: #333;
+        }
+
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .remove {
+            margin-top: 8px;
+            color: #b42318;
+            background: transparent;
+        }
+
+        .remove:hover {
+            color: white;
+            background: #b42318;
+        }
+
+        .summary {
+            margin-top: 24px;
+            padding: 24px;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            text-align: right;
+        }
+
+        .total {
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .summary-actions {
+            display: flex;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .checkout-button {
+            background: #111;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .checkout-button:hover {
+            background: #444;
+        }
+
+        .messages {
+            padding: 12px;
+            margin-bottom: 16px;
+            background: #eee;
+            border-radius: 4px;
+        }
+
+        .continue-shopping {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .cart-item {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .cart-item form {
+                margin-top: 10px;
+            }
+
+            .summary-actions {
+                flex-direction: column;
+            }
+
+            .summary-actions .button,
+            .summary-actions button {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <a href="{{ url_for('main.home') }}">
+            <h1>MENSTYLE</h1>
+        </a>
+    </header>
+
+    <main>
+        <h2>Giỏ hàng của bạn</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="messages">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if items %}
+            {% for item in items %}
+                <section class="cart-item">
+                    <div>
+                        <h3>{{ item.product.name }}</h3>
+
+                        <p>
+                            Đơn giá:
+                            {{ "{:,.0f}".format(item.price) }} VNĐ
+                        </p>
+
+                        <p class="price">
+                            Thành tiền:
+                            {{ "{:,.0f}".format(item.subtotal) }} VNĐ
+                        </p>
+
+                        {% if item.product.stock <= 0 %}
+                            <p style="color: #b42318;">
+                                Sản phẩm hiện đã hết hàng.
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'cart.update_cart',
+                                product_id=item.product.id
+                            ) }}"
+                        >
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <label>
+                                Số lượng:
+                                <input
+                                    type="number"
+                                    name="quantity"
+                                    min="1"
+                                    max="{{ item.product.stock }}"
+                                    value="{{ item.quantity }}"
+                                    required
+                                >
+                            </label>
+
+                            <button
+                                type="submit"
+                                {% if item.product.stock <= 0 %}
+                                    disabled
+                                {% endif %}
+                            >
+                                Cập nhật
+                            </button>
+                        </form>
+
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'cart.remove_from_cart',
+                                product_id=item.product.id
+                            ) }}"
+                        >
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button
+                                class="remove"
+                                type="submit"
+                            >
+                                Xóa sản phẩm
+                            </button>
+                        </form>
+                    </div>
+                </section>
+            {% endfor %}
+
+            <section class="summary">
+                <p>Tổng tiền hàng</p>
+
+                <p class="total">
+                    {{ "{:,.0f}".format(total) }} VNĐ
+                </p>
+
+                <p>
+                    Phí vận chuyển và thông tin nhận hàng
+                    sẽ được xác nhận ở bước đặt hàng.
+                </p>
+
+                <div class="summary-actions">
+                    <a
+                        class="button"
+                        href="{{ url_for('products.product_list') }}"
+                    >
+                        Tiếp tục mua sắm
+                    </a>
+
+                    <a
+                        class="button checkout-button"
+                        href="{{ url_for('orders.checkout') }}"
+                    >
+                        TIẾN HÀNH THANH TOÁN
+                    </a>
+                </div>
+            </section>
+        {% else %}
+            <p>Giỏ hàng đang trống.</p>
+
+            <p>
+                <a
+                    class="button"
+                    href="{{ url_for('products.product_list') }}"
+                >
+                    Khám phá sản phẩm
+                </a>
+            </p>
+        {% endif %}
+    </main>
+</body>
+</html>

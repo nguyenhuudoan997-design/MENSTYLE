@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt hàng thành công | MENSTYLE</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 24px;
+            background: #f5f5f5;
+            font-family: Arial, sans-serif;
+            color: #171717;
+        }
+        main {
+            max-width: 620px;
+            margin: 60px auto;
+            padding: 36px;
+            background: white;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .check { font-size: 48px; }
+        .code { font-size: 22px; font-weight: bold; }
+        .info {
+            margin: 24px 0;
+            padding: 20px;
+            background: #f5f5f5;
+            text-align: left;
+            line-height: 1.9;
+        }
+        a {
+            display: inline-block;
+            padding: 13px 22px;
+            background: #111;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <div class="check">✓</div>
+    <h1>Đặt hàng thành công!</h1>
+    <p>Cảm ơn bạn đã mua sắm tại MENSTYLE.</p>
+
+    <p>Mã đơn hàng:</p>
+    <div class="code">{{ order.order_code }}</div>
+
+    <div class="info">
+        <div><strong>Người nhận:</strong> {{ order.recipient_name }}</div>
+        <div><strong>Số điện thoại:</strong> {{ order.recipient_phone }}</div>
+        <div><strong>Địa chỉ:</strong> {{ order.shipping_address }}</div>
+        <div>
+            <strong>Tổng tiền:</strong>
+            {{ "{:,.0f}".format(order.total_amount) }} đ
+        </div>
+        <div><strong>Thanh toán:</strong> Khi nhận hàng (COD)</div>
+        <div><strong>Trạng thái:</strong> {{ order.order_status }}</div>
+    </div>
+
+    <a href="{{ url_for('main.home') }}">Tiếp tục mua sắm</a>
+</main>
+</body>
+</html>

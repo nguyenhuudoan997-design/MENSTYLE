@@ -1,0 +1,389 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn hàng - MENSTYLE</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 24px;
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        a {
+            color: #155eef;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin: 16px 0;
+        }
+
+        .filter-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
+        }
+
+        .filter-form {
+            display: flex;
+            align-items: end;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input,
+        select,
+        button,
+        .reset-button {
+            min-height: 42px;
+            padding: 10px 12px;
+            border: 1px solid #ccd2da;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        input,
+        select {
+            background: #fff;
+        }
+
+        button {
+            border: none;
+            background: #17202a;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #34495e;
+        }
+
+        .reset-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #e9edf2;
+            color: #222;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            background: white;
+            border-radius: 10px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
+        }
+
+        .result-count {
+            margin: 0 0 14px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #17202a;
+            color: white;
+            white-space: nowrap;
+        }
+
+        tbody tr:hover {
+            background: #f7f9fc;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 9px;
+            background: #e9edf2;
+            border-radius: 20px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .detail-link {
+            display: inline-block;
+            padding: 8px 10px;
+            background: #e8efff;
+            border-radius: 5px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 22px;
+        }
+
+        .pagination a,
+        .pagination span {
+            display: inline-block;
+            padding: 9px 13px;
+            border: 1px solid #d5dae1;
+            border-radius: 6px;
+            background: #fff;
+        }
+
+        .pagination .current {
+            background: #17202a;
+            color: #fff;
+            border-color: #17202a;
+        }
+
+        .pagination .disabled {
+            color: #999;
+            background: #f0f1f3;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 14px;
+            }
+
+            .filter-form {
+                align-items: stretch;
+            }
+
+            .form-group {
+                min-width: 100%;
+            }
+
+            .filter-form button,
+            .filter-form .reset-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <div class="header">
+            <h1>Danh sách đơn hàng</h1>
+        </div>
+
+        <a class="back-link"
+           href="{{ url_for('employee.dashboard') }}">
+            ← Quay lại trang nhân viên
+        </a>
+
+        <section class="filter-box">
+            <form class="filter-form"
+                  method="GET"
+                  action="{{ url_for('employee.order_list') }}">
+
+                <div class="form-group">
+                    <label for="keyword">Tìm kiếm mã đơn hàng</label>
+                    <input
+                        type="text"
+                        id="keyword"
+                        name="keyword"
+                        placeholder="Nhập mã đơn hàng..."
+                        value="{{ keyword }}"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Lọc trạng thái đơn</label>
+                    <select id="status" name="status">
+                        <option value="">Tất cả trạng thái</option>
+
+                        {% for status in order_statuses %}
+                            <option
+                                value="{{ status }}"
+                                {% if selected_status == status %}selected{% endif %}
+                            >
+                                {{ status }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit">Tìm kiếm / Lọc</button>
+
+                <a class="reset-button"
+                   href="{{ url_for('employee.order_list') }}">
+                    Xóa bộ lọc
+                </a>
+            </form>
+        </section>
+
+        <section class="table-wrapper">
+            <p class="result-count">
+                Tìm thấy {{ pagination.total }} đơn hàng.
+                Trang {{ pagination.page }} / {{ pagination.pages or 1 }}.
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Người nhận</th>
+                        <th>Số điện thoại</th>
+                        <th>Tổng tiền</th>
+                        <th>Thanh toán</th>
+                        <th>Trạng thái đơn</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.order_code }}</td>
+                        <td>{{ order.recipient_name }}</td>
+                        <td>{{ order.recipient_phone }}</td>
+                        <td>
+                            {{ "{:,.0f}".format(order.total_amount or 0) }} đ
+                        </td>
+                        <td>{{ order.payment_status }}</td>
+                        <td>
+                            <span class="status">
+                                {{ order.order_status }}
+                            </span>
+                        </td>
+                        <td>
+                            <a class="detail-link"
+                               href="{{ url_for(
+                                   'employee.order_detail',
+                                   order_id=order.id
+                               ) }}">
+                                Xem chi tiết
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            Không tìm thấy đơn hàng phù hợp.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if pagination.pages > 1 %}
+            <nav class="pagination" aria-label="Phân trang đơn hàng">
+
+                {% if pagination.has_prev %}
+                    <a href="{{ url_for(
+                        'employee.order_list',
+                        page=pagination.prev_num,
+                        keyword=keyword,
+                        status=selected_status
+                    ) }}">← Trước</a>
+                {% else %}
+                    <span class="disabled">← Trước</span>
+                {% endif %}
+
+                {% for page_num in pagination.iter_pages(
+                    left_edge=1,
+                    right_edge=1,
+                    left_current=2,
+                    right_current=2
+                ) %}
+                    {% if page_num %}
+                        {% if page_num == pagination.page %}
+                            <span class="current" aria-current="page">
+                                {{ page_num }}
+                            </span>
+                        {% else %}
+                            <a href="{{ url_for(
+                                'employee.order_list',
+                                page=page_num,
+                                keyword=keyword,
+                                status=selected_status
+                            ) }}">{{ page_num }}</a>
+                        {% endif %}
+                    {% else %}
+                        <span>…</span>
+                    {% endif %}
+                {% endfor %}
+
+                {% if pagination.has_next %}
+                    <a href="{{ url_for(
+                        'employee.order_list',
+                        page=pagination.next_num,
+                        keyword=keyword,
+                        status=selected_status
+                    ) }}">Sau →</a>
+                {% else %}
+                    <span class="disabled">Sau →</span>
+                {% endif %}
+
+            </nav>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>
