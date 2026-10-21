@@ -28,3 +28,5 @@ htmlcov/
 .idea/
 Thumbs.db
 .DS_Store
+# Sao lưu cơ sở dữ liệu, không đưa lên GitHub
+mensstyle_db_backup.sql
